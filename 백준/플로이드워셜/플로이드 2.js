@@ -39,14 +39,17 @@ for (let k = 1; k <= N; k++) {
     for (let j = 1; j <= N; j++) {
       if (graph[i][k] + graph[k][j] < graph[i][j]) {
         graph[i][j] = graph[i][k] + graph[k][j];
-        via[i][j] = k;
+        via[i][j] = k; // 올바른 경로 저장
       }
     }
   }
 }
 
 for (let i = 1; i <= N; i++) {
-  const parsed = graph[i].slice(1).join(" ");
+  const parsed = graph[i]
+    .slice(1)
+    .map((v) => (v === Infinity ? 0 : v)) // Infinity일 경우 0으로 변환
+    .join(" ");
   console.log(parsed);
 }
 
