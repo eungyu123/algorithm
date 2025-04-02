@@ -3,42 +3,52 @@ const input = fs.readFileSync("input.txt", "utf8").trim().split("\n");
 
 let inputIdx = 0;
 const N = Number(input[inputIdx++]);
-const names = input[inputIdx++].trim().split(" ");
-names.sort(); // 사전순 정렬
-
+const names = input[inputIdx++].trim().split(" ").sort();
 const namesObj = {};
-names.forEach((name, idx) => (namesObj[name] = idx));
 
-const graph = {};
-const inDegree = {};
-
-// 초기화
-for (const name of names) {
-  graph[name] = [];
-  inDegree[name] = 0;
+for (let i = 0; i < names.length; i++) {
+  namesObj[names[i]] = i;
 }
+
+const adj = Array(N)
+  .fill()
+  .map(() => []);
+const inDegree = Array(N).fill(0);
+const queue = [];
 
 const M = Number(input[inputIdx++]);
+
 for (let i = 0; i < M; i++) {
-  const [ancestor, descendant] = input[inputIdx++].trim().split(" ");
-  graph[ancestor].push(descendant);
-  inDegree[descendant]++;
+  const [descendant, ancestor] = input[inputIdx++].trim().split(" ");
+  inDegree[namesObj[descendant]]++;
+  adj[namesObj[ancestor]].push(namesObj[descendant]);
 }
 
-// **Step 1: 시조 찾기**
-const roots = [];
-for (const name of names) {
-  if (inDegree[name] === 0) roots.push(name);
-}
-roots.sort();
+const ancestors = [];
+const answer = Array(N)
+  .fill()
+  .map(() => []);
 
-console.log(roots.length);
-console.log(roots.join(" "));
-
-// **Step 2: 트리 정리**
-const result = [];
-for (const name of names) {
-  graph[name].sort(); // 자식 리스트를 사전순 정렬
-  result.push(`${name} ${graph[name].length} ${graph[name].join(" ")}`.trim());
+for (let i = 0; i < N; i++) {
+  if (inDegree[i] == 0) {
+    ancestors.push(names[i]);
+    queue.push(i);
+  }
 }
-console.log(result.join("\n"));
+
+while (queue.length > 0) {
+  const shiftedIdx = queue.shift();
+  for (let idx of adj[shiftedIdx]) {
+    inDegree[idx]--;
+    if (inDegree[idx] == 0) {
+      queue.push(idx);
+      answer[shiftedIdx].push(names[idx]);
+    }
+  }
+}
+
+console.log(ancestors.length);
+console.log(ancestors.sort().join(" "));
+for (let i = 0; i < answer.length; i++) {
+  console.log(names[i], answer[i].length, answer[i].sort().join(" "));
+}
