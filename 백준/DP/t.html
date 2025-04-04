@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>간단한 그림판</title>
+    <style>
+      body {
+        text-align: center;
+      }
+      canvas {
+        border: 1px solid black;
+        cursor: crosshair;
+      }
+      .toolbar {
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <input type="color" id="colorPicker" />
+      <button onclick="clearCanvas()">지우기</button>
+      <button onclick="setEraser()">지우개</button>
+    </div>
+
+    <canvas id="drawingCanvas" width="800" height="500"></canvas>
+
+    <script>
+      const canvas = document.getElementById("drawingCanvas");
+      const ctx = canvas.getContext("2d");
+      let drawing = false;
+      let currentColor = "#000000";
+
+      // 색상 선택
+      document
+        .getElementById("colorPicker")
+        .addEventListener("input", (event) => {
+          currentColor = event.target.value;
+        });
+
+      // 마우스 이벤트 추가
+      canvas.addEventListener("mousedown", () => (drawing = true));
+      canvas.addEventListener("mouseup", () => {
+        drawing = false;
+        ctx.beginPath();
+      });
+      canvas.addEventListener("mousemove", draw);
+
+      function draw(event) {
+        if (!drawing) return;
+
+        ctx.lineWidth = 50;
+        ctx.lineCap = "round";
+        ctx.strokeStyle = currentColor;
+
+        ctx.lineTo(event.offsetX, event.offsetY);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(event.offsetX, event.offsetY);
+      }
+
+      // 캔버스 초기화
+      function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      // 지우개 기능
+      function setEraser() {
+        currentColor = "#FFFFFF"; // 배경색과 동일하게 설정
+      }
+    </script>
+  </body>
+</html>
+
+<!-- 오래걸릴거같긴하다 -->
